@@ -308,7 +308,7 @@ function PhotoModal({ day, month, year, initialFile, onClose, onPhotoAdd, onRequ
 
                     <div ref={cursorRef} className={`puncher-tool ${isPressing ? 'pressing' : ''} ${isPunching ? 'punching' : ''}`}>
                         <img
-                            src="/public/cortador.png"
+                            src="/cortador.png"
                             style={{ width: '100%', height: '100%', filter: 'drop-shadow(0px 30px 40px rgba(0,0,0,0.6))' }}
                             alt="Cortador cursor"
                         />
