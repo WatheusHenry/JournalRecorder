@@ -1,0 +1,1042 @@
+/* ===== CALENDAR DESK (background) ===== */
+.app {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8e4db;
+  /* Light desk background */
+  padding: 24px;
+}
+
+/* ===== OPEN NOTEBOOK COVER ===== */
+.notebook {
+  width: 100%;
+  max-width: 1300px;
+  height: 90vh;
+  max-height: 900px;
+  background: #a68a73;
+  /* Brown classic cover color from image */
+  border-radius: 12px;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  /* Cover thickness, drop shadow */
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  padding: 10px 14px;
+  /* Reveal cover around the pages */
+  /* Small gap for spine binding */
+}
+
+/* The actual pages */
+.notebook-page {
+  flex: 1;
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.left-page {
+  border-radius: 8px 3px 3px 8px;
+  /* subtle shadow indicating the page curving into the spine */
+  box-shadow:
+    inset -10px 0 20px -10px rgba(0, 0, 0, 0.15),
+    -2px 0 4px rgba(0, 0, 0, 0.05);
+}
+
+.right-page {
+  border-radius: 3px 8px 8px 3px;
+  /* subtle shadow curving into spine on the left + page stack shadow on right */
+  box-shadow:
+    inset 10px 0 20px -10px rgba(0, 0, 0, 0.15),
+    2px 0 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Page lines overlay (optional, subtle dots) */
+.notebook-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--paper-lines) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Center Binding / Spine */
+.notebook-spine {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+}
+
+/* Spine shadow to simulate the deep fold */
+.notebook-spine::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  bottom: -10px;
+  width: 40px;
+  background: linear-gradient(to right, transparent, rgba(121, 121, 121, 0.08) 40%, rgba(139, 139, 139, 0.15) 50%, rgba(163, 163, 163, 0.08) 60%, transparent);
+  pointer-events: none;
+}
+
+/* Bookmark ribbon coming out from the bottom center */
+.bookmark-ribbon {
+  position: absolute;
+  bottom: -60px;
+  width: 14px;
+  height: 60px;
+  background: #92735a;
+  /* Slightly darker than cover */
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  /* Ribbon cut shape at bottom */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 6px), 0 100%);
+  z-index: 5;
+}
+
+/* ===== OVERLAY CONTENT ACROSS BOTH PAGES ===== */
+.notebook-content {
+  position: absolute;
+  inset: 10px 14px;
+  /* Matches cover padding to align perfectly over pages */
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  /* Above the spine and pages */
+  pointer-events: none;
+  /* Let background interaction through if any */
+}
+
+/* Allow clicking on actual content */
+.calendar-header,
+.calendar-container {
+  pointer-events: auto;
+}
+
+/* ===== HEADER CONTEXT ===== */
+.calendar-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 40px 10px 40px;
+  flex-shrink: 0;
+}
+
+.header-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.header-title h1 {
+  font-family: var(--font-body);
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.header-title p {
+  display: none;
+}
+
+.header-nav {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.header-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.month-year-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+}
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--ink-faded);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 400;
+  transition: all 150ms ease;
+  font-family: var(--font-body);
+}
+
+.nav-btn:hover {
+  background: transparent;
+  color: var(--ink);
+}
+
+.month-year-display {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  line-height: 1.1;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.today-btn {
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: 1px solid var(--paper-lines);
+  border-bottom: 2px solid var(--ink-faded);
+  background: white;
+  color: var(--ink-light);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  transition: all 200ms ease;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-2px);
+}
+
+.today-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.today-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-light);
+  border-bottom-color: var(--ink);
+  background: var(--paper);
+}
+
+/* ===== CALENDAR GRID ===== */
+.calendar-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 20px 15px 20px;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+
+
+.weekday-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 2px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.weekday-label {
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink-faded);
+  padding: 6px 0;
+  letter-spacing: 0.02em;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ===== DAY CELL ===== */
+.day-cell {
+  border-radius: 0;
+  padding: 6px;
+  cursor: pointer;
+  transition: background 150ms ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  background: transparent;
+  border: none;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.day-cell:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.day-cell.empty {
+  cursor: default;
+}
+
+.day-cell.empty:hover {
+  background: transparent;
+}
+
+.day-cell.today {
+  background: var(--red-marker-light);
+}
+
+.day-cell.today:hover {
+  background: rgba(192, 82, 74, 0.18);
+}
+
+
+
+.day-number {
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink-light);
+  line-height: 1;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.day-cell.today .day-number {
+  color: var(--red-marker);
+  font-weight: 700;
+}
+
+.day-cell.has-photo .day-number {
+  color: var(--ink);
+}
+
+/* ===== STAMP THUMBNAIL ===== */
+.stamp-container {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  /* margin-top: 2px; */
+  position: relative;
+  transform: rotate(-1deg);
+  background: transparent;
+  container-type: size;
+
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.10)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.05));
+}
+
+.day-cell:nth-child(even) .stamp-container {
+  transform: rotate(0.8deg);
+}
+
+.day-cell:nth-child(3n) .stamp-container {
+  transform: rotate(-0.4deg);
+}
+
+.stamp-inner {
+  position: absolute;
+  box-sizing: border-box;
+  width: min(100cqi, 100cqb * 102 / 111);
+  height: min(100cqb, 100cqi * 111 / 102);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  background: white;
+  
+
+  /* Stamp perforations using pure CSS mask for crisp borders */
+  --r: 5px;
+  --gap: 12px;
+  --bg: black;
+
+  -webkit-mask-image:
+    radial-gradient(circle at var(--gap) 0, transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at var(--gap) 100%, transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at 0 var(--gap), transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at 100% var(--gap), transparent var(--r), var(--bg) 0);
+  -webkit-mask-size:
+    calc(var(--gap)*2) 100%,
+    calc(var(--gap)*2) 100%,
+    100% calc(var(--gap)*2),
+    100% calc(var(--gap)*2);
+  -webkit-mask-position:
+    calc(var(--gap)*-1) 0,
+    calc(var(--gap)*-1) 0,
+    0 calc(var(--gap)*-1),
+    0 calc(var(--gap)*-1);
+  -webkit-mask-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  -webkit-mask-composite: source-in;
+
+  mask-image:
+    radial-gradient(circle at var(--gap) 0, transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at var(--gap) 100%, transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at 0 var(--gap), transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at 100% var(--gap), transparent var(--r), var(--bg) 0);
+  mask-size:
+    calc(var(--gap)*2) 100%,
+    calc(var(--gap)*2) 100%,
+    100% calc(var(--gap)*2),
+    100% calc(var(--gap)*2);
+  mask-position:
+    calc(var(--gap)*-1) 0,
+    calc(var(--gap)*-1) 0,
+    0 calc(var(--gap)*-1),
+    0 calc(var(--gap)*-1);
+  mask-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  mask-composite: intersect;
+}
+
+.stamp-photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-overlay {
+  position: absolute;
+  box-sizing: border-box;
+  width: min(100cqi, 100cqb * 102 / 111);
+  height: min(100cqb, 100cqi * 111 / 102);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.3) 100%);
+  opacity: 0;
+  transition: opacity 150ms ease;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 16px;
+  /* Sits cleanly above the jagged border */
+  pointer-events: none;
+}
+
+.day-cell:hover .photo-overlay {
+  opacity: 1;
+}
+
+.photo-action-icon {
+  font-family: var(--font-hand);
+  font-size: 0.8rem;
+  color: white;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Add photo hint */
+.add-photo-hint {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.day-cell:not(.empty):hover .add-photo-hint {
+  opacity: 1;
+}
+
+.add-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--ink-ghost);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-family: var(--font-hand);
+  color: var(--ink-faded);
+  transition: all 150ms ease;
+}
+
+.day-cell:hover .add-icon {
+  border-color: var(--ink-light);
+  color: var(--ink-light);
+}
+
+/* ===== MODAL ===== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 25, 20, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 200ms ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content {
+  background: var(--paper);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  padding: 40px;
+  max-width: 440px;
+  width: 90%;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: slideUp 250ms ease-out;
+  position: relative;
+}
+
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.modal-header h2 {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.modal-date-badge {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink-faded);
+  margin-top: 6px;
+  display: block;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--ink-faded);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 400;
+  transition: all 150ms ease;
+}
+
+.modal-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--ink);
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Upload Zone */
+.upload-zone {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border: 1px dashed var(--ink-faded);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 200ms ease;
+  background: rgba(255, 255, 255, 0.4);
+  position: relative;
+}
+
+.upload-zone:hover {
+  border-color: var(--ink);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.upload-zone.dragging {
+  border-color: var(--ink);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.upload-icon {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.upload-text {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.upload-subtext {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--ink-faded);
+  margin-top: 6px;
+  letter-spacing: 0.05em;
+}
+
+/* Crop UI */
+.crop-hint {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink-faded);
+  text-align: center;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.crop-area {
+  width: 100%;
+  position: relative;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.crop-area:active {
+  cursor: grabbing;
+}
+
+.crop-bg-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.stamp-cutter {
+  position: absolute;
+  overflow: hidden;
+  /* Mask applied over the entire cutter */
+  --r: 5px;
+  --gap: 12px;
+  --bg: black;
+
+  -webkit-mask-image:
+    radial-gradient(circle at var(--gap) 0, transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at var(--gap) 100%, transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at 0 var(--gap), transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at 100% var(--gap), transparent var(--r), var(--bg) 0);
+  -webkit-mask-size:
+    calc(var(--gap)*2) 100%,
+    calc(var(--gap)*2) 100%,
+    100% calc(var(--gap)*2),
+    100% calc(var(--gap)*2);
+  -webkit-mask-position:
+    calc(var(--gap)*-1) 0,
+    calc(var(--gap)*-1) 0,
+    0 calc(var(--gap)*-1),
+    0 calc(var(--gap)*-1);
+  -webkit-mask-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  -webkit-mask-composite: source-in;
+
+  mask-image:
+    radial-gradient(circle at var(--gap) 0, transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at var(--gap) 100%, transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at 0 var(--gap), transparent var(--r), var(--bg) 0),
+    radial-gradient(circle at 100% var(--gap), transparent var(--r), var(--bg) 0);
+  mask-size:
+    calc(var(--gap)*2) 100%,
+    calc(var(--gap)*2) 100%,
+    100% calc(var(--gap)*2),
+    100% calc(var(--gap)*2);
+  mask-position:
+    calc(var(--gap)*-1) 0,
+    calc(var(--gap)*-1) 0,
+    0 calc(var(--gap)*-1),
+    0 calc(var(--gap)*-1);
+  mask-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  mask-composite: intersect;
+
+  /* Floating shadow over the background */
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+.cutter-inner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.cutter-border-overlay {
+  position: absolute;
+  inset: 0;
+  border: 12px solid white;
+  border-radius: 16px;
+  /* Outer radius minus border width = inner radius rounding */
+  pointer-events: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 4px;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn-primary:hover {
+  background: var(--cover-edge);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ink-light);
+  border: 1px solid var(--paper-lines);
+}
+
+.btn-secondary:hover {
+  background: var(--paper-dark);
+  border-color: var(--ink-faded);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--red-marker);
+  border: 1.5px solid rgba(192, 82, 74, 0.3);
+}
+
+.btn-danger:hover {
+  background: var(--red-marker-light);
+  border-color: var(--red-marker);
+}
+
+/* ===== IMAGE VIEWER MODAL ===== */
+.viewer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 35, 30, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 200ms ease-out;
+  cursor: zoom-out;
+}
+
+.viewer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: default;
+  max-width: 520px;
+  width: 90%;
+  animation: slideUp 250ms ease-out;
+}
+
+/* Title input above photo — floating, no background */
+.viewer-title-area {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.viewer-title-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 4px 0;
+  text-align: center;
+  border-bottom: 1.5px dashed rgba(255, 255, 255, 0.15);
+  transition: border-color 200ms ease;
+}
+
+.viewer-title-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 400;
+}
+
+.viewer-title-input:focus {
+  border-bottom-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Photo frame — polaroid style like before */
+.viewer-photo-frame {
+  background: white;
+  padding: 10px 10px 36px 10px;
+  border: 1px solid var(--photo-border);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    0 12px 48px rgba(0, 0, 0, 0.2);
+  transform: rotate(-0.5deg);
+  line-height: 0;
+}
+
+.viewer-photo {
+  max-width: 70vw;
+  max-height: 55vh;
+  object-fit: contain;
+  display: block;
+}
+
+/* Footer: date + actions — floating, no background */
+.viewer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.viewer-date {
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.viewer-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.viewer-action-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-hand);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: color 150ms ease;
+}
+
+.viewer-action-btn:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.viewer-action-danger:hover {
+  color: var(--red-marker);
+}
+
+/* Close button */
+.viewer-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 150ms ease;
+}
+
+.viewer-close-btn:hover {
+  background: rgba(192, 82, 74, 0.4);
+  border-color: rgba(192, 82, 74, 0.5);
+  color: white;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .app {
+    padding: 12px;
+  }
+
+  .notebook {
+    flex-direction: column;
+    /* Stack pages over each other */
+    height: auto;
+    min-height: 95vh;
+    padding: 10px;
+    gap: 2px;
+  }
+
+  .left-page {
+    border-radius: 8px 8px 3px 3px;
+    box-shadow:
+      inset 0 -10px 20px -10px rgba(0, 0, 0, 0.15),
+      0 -2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .right-page {
+    border-radius: 3px 3px 8px 8px;
+    box-shadow:
+      inset 0 10px 20px -10px rgba(0, 0, 0, 0.15),
+      0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .notebook-spine {
+    width: 100%;
+    height: 2px;
+  }
+
+  .notebook-spine::before {
+    top: -20px;
+    bottom: -20px;
+    left: -10px;
+    right: -10px;
+    width: auto;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.08) 40%, rgba(0, 0, 0, 0.15) 50%, rgba(0, 0, 0, 0.08) 60%, transparent);
+  }
+
+  .bookmark-ribbon {
+    bottom: -40px;
+    left: 40px;
+    width: 14px;
+    height: 60px;
+  }
+
+  .notebook-content {
+    inset: 10px;
+    /* match new padding */
+  }
+
+  .calendar-header {
+    flex-direction: column;
+    padding: 16px 12px;
+    height: auto;
+  }
+
+  .header-left {
+    text-align: center;
+    margin-bottom: 24px;
+    align-items: center;
+  }
+
+  .header-right {
+    margin-top: 24px;
+    justify-content: center;
+  }
+
+  .header-title h1 {
+    font-size: 2.5rem;
+  }
+
+  .month-year-display {
+    font-size: 1.6rem;
+  }
+
+  .calendar-container {
+    padding: 8px;
+  }
+
+  .day-cell {
+    padding: 3px;
+  }
+
+  .day-number {
+    font-size: 0.95rem;
+  }
+
+  .photo-container {
+    padding: 2px;
+  }
+
+  .modal-content {
+    padding: 24px;
+  }
+}
