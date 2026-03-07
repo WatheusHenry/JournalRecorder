@@ -1,4 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { useWebHaptics } from 'web-haptics/react'
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Cancel01Icon, Refresh01Icon, Delete01Icon } from "@hugeicons/core-free-icons"
 
 const MONTHS_PT = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -8,14 +11,18 @@ const MONTHS_PT = [
 function ImageViewer({ photoUrl, title, day, month, year, onClose, onRemove, onReplace, onTitleChange }) {
     const [editingTitle, setEditingTitle] = useState(title)
     const inputRef = useRef(null)
+    const { trigger } = useWebHaptics({ debug: true })
 
     useEffect(() => {
         setEditingTitle(title)
     }, [title])
 
     const handleBackdropClick = useCallback((e) => {
-        if (e.target === e.currentTarget) onClose()
-    }, [onClose])
+        if (e.target === e.currentTarget) {
+            trigger(20)
+            onClose()
+        }
+    }, [onClose, trigger])
 
     const handleTitleBlur = useCallback(() => {
         onTitleChange(editingTitle.trim())
@@ -56,16 +63,20 @@ function ImageViewer({ photoUrl, title, day, month, year, onClose, onRemove, onR
                         {day} de {MONTHS_PT[month]} de {year}
                     </span>
                     <div className="viewer-actions">
-                        <button className="viewer-action-btn" onClick={onReplace}>
+                        <button className="viewer-action-btn" onClick={() => { trigger(20); onReplace(); }} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <HugeiconsIcon icon={Refresh01Icon} size={18} />
                             Trocar
                         </button>
-                        <button className="viewer-action-btn viewer-action-danger" onClick={onRemove}>
+                        <button className="viewer-action-btn viewer-action-danger" onClick={() => { trigger(20); onRemove(); }} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <HugeiconsIcon icon={Delete01Icon} size={18} />
                             Remover
                         </button>
                     </div>
                 </div>
 
-                <button className="viewer-close-btn" onClick={onClose}>✕</button>
+                <button className="viewer-close-btn" onClick={() => { trigger(20); onClose(); }}>
+                    <HugeiconsIcon icon={Cancel01Icon} size={20} />
+                </button>
             </div>
         </div>
     )

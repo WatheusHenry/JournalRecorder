@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { useWebHaptics } from 'web-haptics/react'
 
 // Synthesizes a mechanical click/thud of a hole puncher directly in the browser
 const playPunchSound = () => {
@@ -54,13 +55,14 @@ const playPunchSound = () => {
     }
 }
 
-function PhotoModal({ day, month, year, initialFile, onClose, onPhotoAdd, onRequestReselect }) {
+function PhotoModal({ day, initialFile, onClose, onPhotoAdd, onRequestReselect }) {
     const [preview, setPreview] = useState(null)
     const [isPunching, setIsPunching] = useState(false)
     const [isPressing, setIsPressing] = useState(false)
     const [zoom, setZoom] = useState(1)
     const cursorRef = useRef(null)
     const imageRef = useRef(null)
+    const { trigger } = useWebHaptics({ debug: true })
 
     const processFile = useCallback((file) => {
         if (!file || !file.type.startsWith('image/')) return
@@ -128,16 +130,23 @@ function PhotoModal({ day, month, year, initialFile, onClose, onPhotoAdd, onRequ
     }, [isPunching])
 
     const handleWorkspaceDown = useCallback((e) => {
+        if (e.target.closest && e.target.closest('.puncher-top-nav')) return;
         if (!imageRef.current || isPunching || !preview) return
         if (e.type === 'mousedown' && e.button !== 0) return
 
         // Play mechanic synthesizer when tool presses on paper
         playPunchSound()
+        trigger('nudge')
 
         setIsPressing(true)
-    }, [isPunching, preview])
+    }, [isPunching, preview, trigger])
 
     const handleWorkspaceUp = useCallback((e) => {
+        if (e.target.closest && e.target.closest('.puncher-top-nav')) {
+            setIsPressing(false)
+            return
+        }
+
         if (!isPressing || !imageRef.current || isPunching || !preview) {
             setIsPressing(false)
             return
@@ -191,11 +200,13 @@ function PhotoModal({ day, month, year, initialFile, onClose, onPhotoAdd, onRequ
 
         const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9)
 
+        trigger('success')
+
         // Play finish animation, then save the perfectly cropped selo
         setTimeout(() => {
             onPhotoAdd(day, croppedDataUrl, { x: 50, y: 50 }, preview)
         }, 250)
-    }, [isPressing, isPunching, day, preview, onPhotoAdd])
+    }, [isPressing, isPunching, day, preview, onPhotoAdd, trigger])
 
     return (
         <div
@@ -291,9 +302,16 @@ function PhotoModal({ day, month, year, initialFile, onClose, onPhotoAdd, onRequ
                 <div style={{ color: 'white', fontFamily: 'inherit' }}>Processando imagem...</div>
             ) : (
                 <>
-                    <div className="puncher-top-nav" onClick={e => e.stopPropagation()}>
-                        <button className="puncher-btn" onClick={onRequestReselect || onClose}>Escolher Outra</button>
-                        <button className="puncher-btn" onClick={onClose}>Cancelar</button>
+                    <div 
+                        className="puncher-top-nav" 
+                        onClick={e => e.stopPropagation()}
+                        onMouseDown={e => e.stopPropagation()}
+                        onMouseUp={e => e.stopPropagation()}
+                        onTouchStart={e => e.stopPropagation()}
+                        onTouchEnd={e => e.stopPropagation()}
+                    >
+                        <button className="puncher-btn" onClick={(e) => { trigger(20); onRequestReselect ? onRequestReselect(e) : onClose(e); }}>Escolher Outra</button>
+                        <button className="puncher-btn" onClick={(e) => { trigger(20); onClose(e); }}>Cancelar</button>
                     </div>
 
                     <img

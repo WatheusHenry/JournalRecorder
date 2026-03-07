@@ -1,8 +1,11 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { useWebHaptics } from 'web-haptics/react'
 import './App.css'
 import CalendarGrid from './components/CalendarGrid'
 import PhotoModal from './components/PhotoModal'
 import ImageViewer from './components/ImageViewer'
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons"
 
 const MONTHS_PT = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -39,6 +42,7 @@ function App() {
   const [viewingPhoto, setViewingPhoto] = useState(null)
   const [pendingFile, setPendingFile] = useState(null)
   const fileInputRef = useRef(null)
+  const { trigger } = useWebHaptics({ debug: true })
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(photos))
@@ -48,7 +52,8 @@ function App() {
     localStorage.setItem(TITLES_KEY, JSON.stringify(titles))
   }, [titles])
 
-  const goToPrevMonth = useCallback(() => {
+  const goToPrevMonth = () => {
+    trigger(30)
     setCurrentMonth(prev => {
       if (prev === 0) {
         setCurrentYear(y => y - 1)
@@ -56,9 +61,10 @@ function App() {
       }
       return prev - 1
     })
-  }, [])
+  }
 
-  const goToNextMonth = useCallback(() => {
+  const goToNextMonth = () => {
+    trigger(30)
     setCurrentMonth(prev => {
       if (prev === 11) {
         setCurrentYear(y => y + 1)
@@ -66,12 +72,13 @@ function App() {
       }
       return prev + 1
     })
-  }, [])
+  }
 
-  const goToToday = useCallback(() => {
+  const goToToday = () => {
+    trigger(30)
     setCurrentMonth(today.getMonth())
     setCurrentYear(today.getFullYear())
-  }, [])
+  }
 
   const getPhotoKey = (year, month, day) => `${year}-${month}-${day}`
 
@@ -80,7 +87,8 @@ function App() {
     return data ? normalizePhoto(data) : null
   }, [photos])
 
-  const handleDayClick = useCallback((day) => {
+  const handleDayClick = (day) => {
+    trigger(20)
     const key = getPhotoKey(currentYear, currentMonth, day)
     if (photos[key]) {
       setViewingPhoto({ key, day })
@@ -88,9 +96,9 @@ function App() {
       setSelectedDay(day)
       fileInputRef.current?.click()
     }
-  }, [currentYear, currentMonth, photos])
+  }
 
-  const handleGlobalFileChange = useCallback((e) => {
+  const handleGlobalFileChange = (e) => {
     const file = e.target.files?.[0]
     if (file) {
       setPendingFile(file)
@@ -98,16 +106,16 @@ function App() {
       setSelectedDay(null)
     }
     e.target.value = ''
-  }, [])
+  }
 
-  const handlePhotoAdd = useCallback((day, photoDataUrl, crop, originalUrl) => {
+  const handlePhotoAdd = (day, photoDataUrl, crop, originalUrl) => {
     const key = getPhotoKey(currentYear, currentMonth, day)
     setPhotos(prev => ({ ...prev, [key]: { url: photoDataUrl, crop, originalUrl: originalUrl || photoDataUrl } }))
     setSelectedDay(null)
     setPendingFile(null)
-  }, [currentYear, currentMonth])
+  }
 
-  const handlePhotoRemove = useCallback((key) => {
+  const handlePhotoRemove = (key) => {
     setPhotos(prev => {
       const next = { ...prev }
       delete next[key]
@@ -119,18 +127,18 @@ function App() {
       return next
     })
     setViewingPhoto(null)
-  }, [])
+  }
 
-  const handleTitleChange = useCallback((key, title) => {
+  const handleTitleChange = (key, title) => {
     setTitles(prev => ({ ...prev, [key]: title }))
-  }, [])
+  }
 
-  const handlePhotoReplace = useCallback(() => {
+  const handlePhotoReplace = () => {
     if (viewingPhoto) {
       setSelectedDay(viewingPhoto.day)
       setViewingPhoto(null)
     }
-  }, [viewingPhoto])
+  }
 
   const isCurrentMonth = currentMonth === today.getMonth() && currentYear === today.getFullYear()
 
@@ -159,7 +167,7 @@ function App() {
 
             <div className="header-nav">
               <button className="nav-btn" onClick={goToPrevMonth} title="Mês anterior">
-                ‹
+                <HugeiconsIcon icon={ArrowLeft01Icon} size={24} />
               </button>
               <div className="month-year-group">
                 <span className="month-year-display">
@@ -167,7 +175,7 @@ function App() {
                 </span>
               </div>
               <button className="nav-btn" onClick={goToNextMonth} title="Próximo mês">
-                ›
+                <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
               </button>
             </div>
 
@@ -186,10 +194,10 @@ function App() {
             month={currentMonth}
             year={currentYear}
             today={today}
-            photos={photos}
             getPhotoKey={getPhotoKey}
             getPhoto={getPhoto}
             onDayClick={handleDayClick}
+            onGoToToday={goToToday}
           />
         </div>
       </div>
@@ -205,8 +213,6 @@ function App() {
         selectedDay !== null && pendingFile !== null && (
           <PhotoModal
             day={selectedDay}
-            month={currentMonth}
-            year={currentYear}
             initialFile={pendingFile}
             onClose={() => { setSelectedDay(null); setPendingFile(null); }}
             onPhotoAdd={handlePhotoAdd}
